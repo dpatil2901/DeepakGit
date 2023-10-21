@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 hii Deepal
 sanjsans
 
 
 i m in master
+=======
+
+dlalkja
+>>>>>>> branch22
+
+

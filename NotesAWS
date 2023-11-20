@@ -1,0 +1,163 @@
+sqoop import \
+--connect jdbc:mysql://localhost:3306/retail_db \
+--username root --password-file file:///home/labuser/LFS/cfg/sqoop.pwd \
+--table orders \
+--target-dir /user/labuser/HFS/Input/p1
+
+
+https://cl1p.net/training
+
+----------------------------------------------------------------------------------------------
+create external table ext_movies_tbl
+(
+movieId int,
+title string,
+genres string
+)
+row format delimited fields terminated by ','
+tblproperties('skip.header.line.count'='1');
+
+load data inpath '/user/labuser/HFS/Input/movies.csv' into table ext_movies_tbl;
+overwrite -truncate and laod
+
+Location::
+create external table ext_movies_tbl1
+(
+movieId int,
+title string,
+genres string
+)
+row format delimited fields terminated by ','
+location '/user/hive/warehouse/deepakdb.db/ext_movies_tbl/'
+tblproperties('skip.header.line.count'='1');
+
+
+
+create table map_tbl
+(
+id int ,
+name string,
+sal int,
+lappy_info array<string>,
+pf_info map<string,int>,
+city string
+)
+row format delimited fields terminated by ','
+collection items terminated by '$'
+map keys terminated by '#'
+tblproperties('skio.header.line.count'='1');
+
+hdfs dfs -copyFromLocal map_file.txt /user/labuser/HFS/Input/
+load data inpath '/user/labuser/HFS/Input/map_file.txt' into table map_tbl;
+-----------
+create table struct_tbl
+(
+id int,
+name string,
+sal int,
+subject array<string>,
+deduction map<string,int>,
+address struct<state:string,city:string,pincode:int>
+)
+row format delimited fields terminated by ','
+collection items terminated by '$'
+map keys terminated by '#'
+tblproperties('skio.header.line.count'='1');
+-----------------------------------------------
+
+create table stc_prtn
+(
+id int,
+name string,
+sal int
+)
+partitioned by(country string)
+row format delimited fields terminated by ','
+tblproperties('skio.header.line.count'='1');
+
+
+load data local inpath '/home/labuser/LFS/datasets/emp_ind.txt' into table stc_prtn partition (country='IN');
+
+
+
+create table stc_prtn_all
+(
+id int,
+name string,
+sal int
+)
+partitioned by(country string)
+row format delimited fields terminated by ','
+tblproperties('skio.header.line.count'='1');
+
+load data local inpath '/home/labuser/LFS/datasets/emp_partition_all.txt' into table stc_prtn_all partition (country='IN');
+problem: all countries data laoded in one partiyion
+sol:
+
+create table stc_co
+(
+id int,
+name string,
+sal int,
+country string
+)
+row format delimited fields terminated by ','
+tblproperties('skio.header.line.count'='1');
+
+load data local inpath '/home/labuser/LFS/datasets/emp_partition_all.txt' into table stc_co;
+
+
+create table stc_prtn_all_1
+(
+id int,
+name string,
+sal int
+)
+partitioned by(country string)
+row format delimited fields terminated by ','
+;
+
+
+insert into table stc_prtn_all_1 partition (country='IN') select id,name,sal from stc_co where country='IN';
+insert into table stc_prtn_all_1 partition (country='UK') select id,name,sal from stc_co where country='UK';
+insert into table stc_prtn_all_1 partition (country='US') select id,name,sal from stc_co where country='US';
+
+
+
+******Dynamic Partition********
+
+create table dyn_prtn_all
+(
+id int,
+name string,
+sal int
+)
+partitioned by (country string)
+row format delimited fields terminated by ',';
+
+insert into table dyn_prtn_all partition (country) select id,name,sal,country from stg_country;
+
+Enable this property:
+set hive.exec.dynamic.partition.mode=nonstrict;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

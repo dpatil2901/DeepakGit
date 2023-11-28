@@ -1,4 +1,15 @@
 https://github.com/ArifShaikh123890
+from pyspark.sql import SparkSession
+
+if __name__ == '__main__':
+    spark = SparkSession.builder \
+            .appName('Read Write DF').master('local[*]') \
+            .getOrCreate()
+
+    moviesDf = spark.read.format('csv')\
+        .option('header','true')\
+        .load('hdfs://cdhserver:8020/user/labuser/HFS/Input/movies.csv')
+    # moviesDf.show(5, truncate=False)
 
 
 sqoop import \
